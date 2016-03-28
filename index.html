@@ -1,0 +1,99 @@
+<html>
+	<head>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script src="maze-generator.js"></script>
+	</head>
+
+	<body>
+        <div>
+            <div>
+                Rows: <input type="range" id="rows" min="4" value="10" max="30" step="1"> <output for="rows" id="rowsOut"></output>
+            </div>
+            <div>
+            Cols: <input type="range" id="cols" min="4" value="10" max="30" step="1"><output for="cols" id="colsOut"></output>
+            </div>
+            <div>
+            Step: <input type="range" id="step" min="0" value="50" max="500" step="1"><output for="step" id="stepOut"></output>
+            </div>
+            <button name="start">Start</button>
+        </div>
+		<div id="tableDiv">
+
+        </div>
+
+		<style>
+			table td {
+				border : 1px solid black;
+			}
+            table td.color-yellow {
+                background: yellow;
+            }
+            table { border-collapse:collapse }
+		</style>
+
+	</body>
+
+    <script>
+
+        var createTr = function() {
+            return document.createElement("tr");
+        };
+        var createTd = function() {
+            return document.createElement("td");
+        };
+
+    </script>
+    <script type="text/javascript">
+
+        jQuery("input#rows").on('change', function(evt) {
+            jQuery("output[id='rowsOut']").html(jQuery(this).val());
+        }).trigger('change');
+        jQuery("input#cols").on('change', function(evt) {
+            jQuery("output[id='colsOut']").html(jQuery(this).val());
+        }).trigger('change');
+        jQuery("input#step").on('change', function(evt) {
+            jQuery("output[id='stepOut']").html(jQuery(this).val());
+        }).trigger('change');
+
+        jQuery("button[name='start']").on('click', function(evt) {
+            evt.preventDefault();
+
+            jQuery('input, button').attr('disabled', 'disabled');
+
+            var $table = jQuery('<table cellspacing="0"; cellpadding="0"; style="border:0"></table>');
+            jQuery("div#tableDiv").html('').append($table);
+            var rows = jQuery('input#rows').val(), columns = jQuery('input#cols').val();
+            window.step = jQuery('input#step').val() || 20;
+
+            for(var i = 0; i < rows; i++) {
+                var $tr = jQuery(createTr());
+                for(var j = 0; j < columns; j++) {
+                    var $td = jQuery(createTd());
+
+
+
+                    $td.attr('id', 'x' + i + '_' + 'y' + j);
+                    $td.html('O');
+                    $tr.append($td);
+                }
+                $table.append($tr);
+            }
+
+            Mazegenerator.generate(rows, columns, {
+                onTraversal : function(node) {
+                    // NOOP.
+                },
+                onMarkVisited : function(row, column) {
+                    console.log("Marking as visited: (" + row + "," + column + ")");
+                    jQuery("table td#" + 'x' + row + '_' + 'y' +  column)
+                        .html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;").removeClass('color-yellow');
+                },
+                onComplete : function() {
+                    jQuery('input, button').removeAttr('disabled');
+                }
+            });
+        })
+
+    </script>
+
+</html>
